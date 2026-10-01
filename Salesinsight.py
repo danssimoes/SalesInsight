@@ -2,7 +2,7 @@ import csv
 import random
 from datetime import datetime, timedelta
 
-
+# Gerar um dataset
 def gerar_dataset_vendas(caminho_csv="vendas.csv", n_registros=200, seed=42):
     """Gera um dataset sintetico de vendas com dados sujos e grava em CSV."""
 
@@ -121,10 +121,53 @@ def gerar_dataset_vendas(caminho_csv="vendas.csv", n_registros=200, seed=42):
                 "preco_unitario": preco
             })
 
-    print(
-        f"Dataset gerado com {n_registros} registros "
-        f"em {caminho_csv}."
-    )
+    print(f"Dataset gerado com {n_registros} registros em {caminho_csv}.")
 
 
 gerar_dataset_vendas()
+
+# Inspecionar e descrever o dataset gerado
+def carregar_dataset(caminho_csv):
+    """Carrega o dataset CSV e retorna uma lista de dicionários."""
+
+    registros = []
+
+    with open(caminho_csv, "r", encoding="utf-8") as arquivo:
+        leitor = csv.DictReader(arquivo)
+
+        for linha in leitor:
+            registros.append(linha)
+
+    return registros
+
+registros = carregar_dataset("vendas.csv")
+
+# Inspecionar os dados
+def inspecionar_dados(registros):
+    """Exibe informações iniciais sobre o dataset."""
+
+    print(f"\n=== INSPECAO INICIAL DO DATASET ===")
+
+    print(f"\nTotal de registros: {len(registros)}")
+
+    if registros:
+        print("\nColunas:")
+        print(list(registros[0].keys()))
+
+    print("\nValores ausentes:")
+
+    colunas = registros[0].keys()
+
+    for coluna in colunas:
+        ausentes = 0
+
+        for registro in registros:
+            if registro[coluna] == "":
+                ausentes += 1
+
+        print(f"{coluna}: {ausentes}")
+
+    print("\nPrimeiros registros:")
+
+    for registro in registros[:5]:
+        print(registro)
