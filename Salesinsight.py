@@ -123,8 +123,6 @@ def gerar_dataset_vendas(caminho_csv="vendas.csv", n_registros=200, seed=42):
 
     print(f"Dataset gerado com {n_registros} registros em {caminho_csv}.")
 
-gerar_dataset_vendas()
-
 def carregar_dataset(caminho_csv):
     #Carrega o dataset CSV e retorna uma lista de dicionários
 
@@ -515,7 +513,7 @@ def segmentar_clientes(registros):
     )
 
     return clientes
-
+    
 def exibir_segmentacao(clientes):
     #Exibe os 10 maiores clientes e a distribuição dos segmentos
     print("ENTREI NA FUNÇÃO EXIBIR_SEGMENTACAO")
@@ -541,3 +539,71 @@ def exibir_segmentacao(clientes):
 
     for segmento, quantidade in distribuicao.items():
         print(f"{segmento}: {quantidade}")
+
+
+def processar_coluna(
+    registros,
+    coluna,
+    funcao_transformacao,
+    nome_saida=None
+):
+    # Aplica uma função de transformação aos valores de uma coluna.
+    # Demonstra o uso de função de ordem superior.
+    
+
+    if nome_saida is None:
+        nome_saida = f"{coluna}_transformado"
+
+    for registro in registros:
+        registro[nome_saida] = funcao_transformacao(
+            registro[coluna]
+        )
+
+    return registros
+
+registros = processar_coluna(
+    registros,
+    "receita_total",
+    lambda x: round(x / 1000, 2),
+    nome_saida="receita_em_milhares"
+)
+
+registros = processar_coluna(
+    registros,
+    "quantidade",
+    lambda q: "Alto Volume" if q > 5 else "Baixo Volume",
+    nome_saida="perfil_volume"
+)
+def main():
+
+    gerar_dataset_vendas()
+
+    registros = carregar_dataset("vendas.csv")
+
+    inspecionar_dados(registros)
+
+    registros_limpos, relatorio = limpar_dados(registros)
+
+    print("\n=== RELATORIO DE LIMPEZA ===")
+    print(relatorio)
+
+    registros_limpos = criar_colunas_derivadas(
+        registros_limpos
+    )
+
+    print("\n=== DADOS APOS TRANSFORMACAO ===")
+
+    for registro in registros_limpos[:5]:
+        print(registro)
+
+    metricas = calcular_metricas(
+        registros_limpos
+    )
+
+    exibir_metricas(metricas)
+
+    clientes = segmentar_clientes(
+        registros_limpos
+    )
+
+    exibir_segmentacao(clientes)
